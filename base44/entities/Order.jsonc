@@ -1,0 +1,135 @@
+{
+  "name": "Order",
+  "type": "object",
+  "properties": {
+    "order_number": {
+      "type": "string"
+    },
+    "customer_email": {
+      "type": "string"
+    },
+    "customer_name": {
+      "type": "string"
+    },
+    "customer_id": {
+      "type": "string"
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "product_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "variant": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "number"
+          },
+          "price": {
+            "type": "number"
+          },
+          "image": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "subtotal": {
+      "type": "number"
+    },
+    "discount_amount": {
+      "type": "number",
+      "default": 0
+    },
+    "discount_code": {
+      "type": "string"
+    },
+    "shipping_cost": {
+      "type": "number"
+    },
+    "shipping_method": {
+      "type": "string"
+    },
+    "tax": {
+      "type": "number"
+    },
+    "total": {
+      "type": "number"
+    },
+    "payment_status": {
+      "type": "string",
+      "enum": [
+        "Payment Pending",
+        "Paid",
+        "Processing",
+        "Packed",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Refunded"
+      ],
+      "default": "Payment Pending"
+    },
+    "fulfillment_status": {
+      "type": "string",
+      "enum": [
+        "Processing",
+        "Packed",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
+        "Refunded"
+      ],
+      "default": "Processing"
+    },
+    "shipping_address": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "line1": {
+          "type": "string"
+        },
+        "line2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "zip": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        }
+      }
+    },
+    "tracking_number": {
+      "type": "string"
+    },
+    "tracking_url": {
+      "type": "string"
+    },
+    "stripe_session_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "order_number",
+    "customer_email",
+    "total"
+  ]
+}

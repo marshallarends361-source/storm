@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 225 30% 4%;
+    --foreground: 0 0% 98%;
+    --card: 225 24% 7%;
+    --card-foreground: 0 0% 98%;
+    --popover: 225 24% 7%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 199 100% 45%;
+    --primary-foreground: 225 30% 4%;
+    --secondary: 225 18% 12%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 225 16% 12%;
+    --muted-foreground: 220 12% 60%;
+    --accent: 199 100% 55%;
+    --accent-foreground: 225 30% 4%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 225 18% 16%;
+    --input: 225 18% 16%;
+    --ring: 199 100% 45%;
+    --chart-1: 199 100% 45%;
+    --chart-2: 142 70% 45%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 0 72% 51%;
+    --radius: 0.5rem;
+    --font-heading: 'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Rajdhani', 'Inter', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-body;
+  }
+}
+
+.font-display { font-family: 'Rajdhani', sans-serif; letter-spacing: 0.02em; }
+
+.glass-panel {
+  background: linear-gradient(135deg, rgba(18, 22, 30, 0.85), rgba(10, 12, 18, 0.95));
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 180, 255, 0.10);
+}
+
+.glow-blue {
+  box-shadow: 0 0 24px rgba(0, 180, 255, 0.20), 0 0 48px rgba(0, 180, 255, 0.06);
+}
+
+.text-glow { text-shadow: 0 0 18px rgba(0, 180, 255, 0.55); }
+
+.clip-angular {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+
+.btn-angular {
+  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+}
+
+.hero-grid {
+  background-image: linear-gradient(rgba(0,180,255,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,180,255,0.06) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: hsl(225, 30%, 4%); }
+::-webkit-scrollbar-thumb { background: hsl(225, 18%, 22%); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: hsl(199, 100%, 45%); }

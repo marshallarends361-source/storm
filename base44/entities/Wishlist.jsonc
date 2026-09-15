@@ -1,0 +1,16 @@
+{
+  "name": "Wishlist",
+  "type": "object",
+  "properties": {
+    "customer_id": {
+      "type": "string"
+    },
+    "product_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "customer_id",
+    "product_id"
+  ]
+}

@@ -1,0 +1,114 @@
+{
+  "name": "Product",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "slug": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "price": {
+      "type": "number"
+    },
+    "sale_price": {
+      "type": "number"
+    },
+    "sku": {
+      "type": "string"
+    },
+    "inventory_quantity": {
+      "type": "number",
+      "default": 0
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Electric Dirt Bikes",
+        "E-Motos",
+        "Electric Mountain Bikes",
+        "Commuter E-Bikes",
+        "Fat-Tire E-Bikes",
+        "Kids E-Bikes",
+        "Batteries",
+        "Chargers",
+        "Replacement Parts",
+        "Performance Parts",
+        "Accessories",
+        "Helmets & Safety Gear"
+      ]
+    },
+    "images": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "featured": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_new": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_bestseller": {
+      "type": "boolean",
+      "default": false
+    },
+    "is_limited": {
+      "type": "boolean",
+      "default": false
+    },
+    "motor_power": {
+      "type": "string"
+    },
+    "battery_voltage": {
+      "type": "string"
+    },
+    "battery_capacity": {
+      "type": "string"
+    },
+    "estimated_range": {
+      "type": "string"
+    },
+    "top_speed": {
+      "type": "string"
+    },
+    "charge_time": {
+      "type": "string"
+    },
+    "weight": {
+      "type": "string"
+    },
+    "suspension": {
+      "type": "string"
+    },
+    "brakes": {
+      "type": "string"
+    },
+    "tire_size": {
+      "type": "string"
+    },
+    "frame_info": {
+      "type": "string"
+    },
+    "warranty": {
+      "type": "string"
+    },
+    "whats_included": {
+      "type": "string"
+    },
+    "shipping_info": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "price",
+    "category"
+  ]
+}

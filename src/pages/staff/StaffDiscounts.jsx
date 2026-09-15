@@ -1,0 +1,81 @@
+import { useEffect, useState } from 'react';
+import { base44 } from '@/api/base44Client';
+import { useToast } from '@/components/ui/use-toast';
+import { Loader2, Plus, Trash2, Power } from 'lucide-react';
+
+export default function StaffDiscounts() {
+  const { toast } = useToast();
+  const [codes, setCodes] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [f, setF] = useState({ code: '', type: 'percentage', value: '', min_order_amount: 0, usage_limit: '', expires_at: '' });
+
+  const load = async () => {
+    setCodes(null);
+    try { setCodes(await base44.entities.DiscountCode.list('-created_date', 100)); }
+    catch { setCodes([]); }
+  };
+  useEffect(() => { load(); }, []);
+
+  const create = async (e) => {
+    e.preventDefault();
+    if (!f.code || !f.value) { toast({ title: 'Code and value required', variant: 'destructive' }); return; }
+    try {
+      await base44.entities.DiscountCode.create({
+        code: f.code.toUpperCase(), type: f.type, value: Number(f.value),
+        min_order_amount: Number(f.min_order_amount) || 0, usage_limit: f.usage_limit ? Number(f.usage_limit) : null,
+        expires_at: f.expires_at || null, active: true, used_count: 0,
+      });
+      toast({ title: 'Discount created' });
+      setF({ code: '', type: 'percentage', value: '', min_order_amount: 0, usage_limit: '', expires_at: '' });
+      setShowForm(false);
+      load();
+    } catch (e2) { toast({ title: 'Failed', description: e2.message, variant: 'destructive' }); }
+  };
+
+  const toggle = async (c) => {
+    await base44.entities.DiscountCode.update(c.id, { active: !c.active });
+    setCodes(codes.map((x) => (x.id === c.id ? { ...x, active: !x.active } : x)));
+  };
+
+  const del = async (c) => {
+    if (!confirm(`Delete code ${c.code}?`)) return;
+    await base44.entities.DiscountCode.delete(c.id);
+    setCodes(codes.filter((x) => x.id !== c.id));
+    toast({ title: 'Deleted' });
+  };
+
+  const input = 'h-9 px-3 rounded-md bg-input border border-border text-sm w-full';
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="font-display text-xl md:text-2xl font-bold">Discount Codes</h1>
+        <button onClick={() => setShowForm(!showForm)} className="btn-angular bg-primary text-primary-foreground px-4 h-9 text-sm font-semibold flex items-center gap-1.5"><Plus className="w-4 h-4" /> New</button>
+      </div>
+
+      {showForm && (
+        <form onSubmit={create} className="glass-panel rounded-lg p-3 mb-4 grid grid-cols-2 md:grid-cols-5 gap-2">
+          <input className={input} placeholder="CODE" value={f.code} onChange={(e) => setF({ ...f, code: e.target.value.toUpperCase() })} />
+          <select value={f.type} onChange={(e) => setF({ ...f, type: e.target.value })} className={input}><option value="percentage">Percentage</option><option value="fixed">Fixed</option></select>
+          <input className={input} type="number" placeholder="Value" value={f.value} onChange={(e) => setF({ ...f, value: e.target.value })} />
+          <input className={input} type="number" placeholder="Min order" value={f.min_order_amount} onChange={(e) => setF({ ...f, min_order_amount: e.target.value })} />
+          <button type="submit" className="h-9 bg-primary text-primary-foreground rounded-md text-sm font-semibold">Create</button>
+        </form>
+      )}
+
+      {!codes ? <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div> : codes.length === 0 ? <p className="text-sm text-muted-foreground">No discount codes.</p> : (
+        <div className="space-y-2">
+          {codes.map((c) => (
+            <div key={c.id} className="glass-panel rounded-lg p-3 flex items-center gap-3">
+              <div className="font-mono font-bold text-sm flex-1">{c.code}</div>
+              <div className="text-xs text-muted-foreground">{c.type === 'percentage' ? `${c.value}% off` : `$${c.value} off`} · {c.used_count || 0} used</div>
+              <span className={`text-[10px] px-2 py-0.5 rounded ${c.active ? 'bg-emerald-500/15 text-emerald-400' : 'bg-secondary text-muted-foreground'}`}>{c.active ? 'Active' : 'Inactive'}</span>
+              <button onClick={() => toggle(c)} className="p-2 text-muted-foreground hover:text-primary"><Power className="w-4 h-4" /></button>
+              <button onClick={() => del(c)} className="p-2 text-muted-foreground hover:text-destructive"><Trash2 className="w-4 h-4" /></button>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}

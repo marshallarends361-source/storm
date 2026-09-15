@@ -1,0 +1,19 @@
+{
+  "name": "ExportLog",
+  "type": "object",
+  "properties": {
+    "version": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "version",
+    "created_by"
+  ]
+}
