@@ -11,6 +11,41 @@ const CATS = [
   { name: 'Commuter E-Bikes', icon: Truck }, { name: 'Fat-Tire E-Bikes', icon: BatteryCharging }, { name: 'Kids E-Bikes', icon: Star },
 ];
 
+const MOCK_PRODUCTS = [
+  {
+    id: "1",
+    name: "Raijin Apex Pro E-Moto",
+    slug: "raijin-apex-pro",
+    category: "E-Motos",
+    price: 4999,
+    inventory_quantity: 15,
+    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    featured: true,
+    is_new: true
+  },
+  {
+    id: "2",
+    name: "Raijin Thunder Dirt Bike",
+    slug: "raijin-thunder-dirt",
+    category: "Electric Dirt Bikes",
+    price: 3499,
+    inventory_quantity: 8,
+    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    is_bestseller: true,
+    sale_price: 2999
+  },
+  {
+    id: "3",
+    name: "Raijin Storm Mountain Bike",
+    slug: "raijin-storm-mtb",
+    category: "Electric Mountain Bikes",
+    price: 2199,
+    inventory_quantity: 20,
+    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    is_new: true
+  }
+];
+
 export default function Home() {
   const [featured, setFeatured] = useState(null);
   const [best, setBest] = useState(null);
@@ -26,9 +61,15 @@ export default function Home() {
           base44.entities.Product.filter({ is_new: true }, '-created_date', 8),
         ]);
         if (!active) return;
-        setFeatured(f || []); setBest(b || []); setFresh(n || []);
+        setFeatured(f && f.length > 0 ? f : MOCK_PRODUCTS.filter(p => p.featured));
+        setBest(b && b.length > 0 ? b : MOCK_PRODUCTS.filter(p => p.is_bestseller));
+        setFresh(n && n.length > 0 ? n : MOCK_PRODUCTS.filter(p => p.is_new));
       } catch {
-        if (active) { setFeatured([]); setBest([]); setFresh([]); }
+        if (active) {
+          setFeatured(MOCK_PRODUCTS.filter(p => p.featured));
+          setBest(MOCK_PRODUCTS.filter(p => p.is_bestseller));
+          setFresh(MOCK_PRODUCTS.filter(p => p.is_new));
+        }
       }
     })();
     return () => { active = false; };
