@@ -40,6 +40,7 @@ export default function Navbar() {
           <Link to="/shop" className="hover:text-primary transition-colors">Shop</Link>
           <Link to="/shop?cat=E-Motos" className="hover:text-primary transition-colors">E-Motos</Link>
           <Link to="/shop?cat=Electric%20Dirt%20Bikes" className="hover:text-primary transition-colors">Dirt Bikes</Link>
+          <Link to="/staff/dashboard" className="text-amber-400 border border-amber-400/30 px-2.5 py-1 rounded text-xs hover:bg-amber-400/10 transition-all font-bold tracking-wide">Owner Control</Link>
           <Link to="/account" className="hover:text-primary transition-colors flex items-center gap-1"><User className="w-4 h-4" />{user ? 'Account' : 'Sign In'}</Link>
         </nav>
 
