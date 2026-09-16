@@ -71,11 +71,18 @@ export default function ProductDetail() {
   ]);
   const [newReview, setNewReview] = useState({ rating: 5, text: '' });
   const { add } = useCart();
-  const { user } = useAuth();
   const { toast } = useToast();
+  const [product, setProduct] = useState(null);
 
-  const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-  const product = saved.find(m => m.slug === slug || m.id === slug) || MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug);
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+      const found = saved.find(m => m.slug === slug || m.id === slug) || MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug);
+      setProduct(found || null);
+    } catch {
+      setProduct(MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug) || null);
+    }
+  }, [slug]);
 
   if (!product) return <div className="text-center py-24"><p className="text-muted-foreground">Product not found.</p><Link to="/shop" className="text-primary text-sm mt-2 inline-block">← Back to shop</Link></div>;
 

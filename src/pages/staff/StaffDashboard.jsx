@@ -13,9 +13,18 @@ const MOCK_PRODUCTS_SUMMARY = [
 ];
 
 export default function StaffDashboard() {
-  const [orders] = useState(MOCK_ORDERS);
-  const [products] = useState(MOCK_PRODUCTS_SUMMARY);
-  const [pendingReviews] = useState([]);
+  const [orders, setOrders] = useState(MOCK_ORDERS);
+  const [products, setProducts] = useState(MOCK_PRODUCTS_SUMMARY);
+  const [pendingReviews, setPendingReviews] = useState([]);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+      if (saved.length > 0) {
+        setProducts(saved.map(p => ({ id: p.id, name: p.name, inventory_quantity: p.inventory_quantity })));
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const revenue = orders.filter((o) => o.payment_status === 'Paid').reduce((s, o) => s + (o.total || 0), 0);
   const lowStock = products.filter((p) => (p.inventory_quantity ?? 0) <= 10);

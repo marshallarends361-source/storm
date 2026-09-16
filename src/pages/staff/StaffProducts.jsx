@@ -17,17 +17,21 @@ export default function StaffProducts() {
 
   const load = () => {
     // Merge base mock products with any products added/edited during this session in local storage
-    const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-    const mockIds = MOCK_PRODUCTS_LIST.map(m => m.id);
-    const custom = saved.filter(p => !mockIds.includes(p.id));
+    try {
+      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+      const mockIds = MOCK_PRODUCTS_LIST.map(m => m.id);
+      const custom = saved.filter(p => !mockIds.includes(p.id));
 
-    // Update any mocks that were edited
-    const updatedMocks = MOCK_PRODUCTS_LIST.map(m => {
-      const edit = saved.find(s => s.id === m.id);
-      return edit || m;
-    });
+      // Update any mocks that were edited
+      const updatedMocks = MOCK_PRODUCTS_LIST.map(m => {
+        const edit = saved.find(s => s.id === m.id);
+        return edit || m;
+      });
 
-    setProducts([...custom, ...updatedMocks]);
+      setProducts([...custom, ...updatedMocks]);
+    } catch {
+      setProducts(MOCK_PRODUCTS_LIST);
+    }
   };
   useEffect(() => { load(); }, []);
 

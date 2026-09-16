@@ -54,14 +54,20 @@ export default function Shop() {
   const cat = params.get('cat') || '';
   const q = params.get('q') || '';
   const [sort, setSort] = useState('featured');
+  const [allProducts, setAllProducts] = useState(MOCK_PRODUCTS);
 
-  // Load from session storage to include any newly imported owner products
-  const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-  const mockIds = MOCK_PRODUCTS.map(m => m.id);
-  const custom = saved.filter(p => !mockIds.includes(p.id));
-  const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
+  useEffect(() => {
+    // Load from session storage safely after mount to prevent build crashes
+    try {
+      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+      const mockIds = MOCK_PRODUCTS.map(m => m.id);
+      const custom = saved.filter(p => !mockIds.includes(p.id));
+      const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
+      setAllProducts([...custom, ...updatedMocks]);
+    } catch { /* ignore */ }
+  }, []);
 
-  let filtered = [...custom, ...updatedMocks];
+  let filtered = allProducts;
 
   if (cat) filtered = filtered.filter((p) => p.category === cat);
   if (q) filtered = filtered.filter((p) => (p.name + p.description + p.category).toLowerCase().includes(q.toLowerCase()));
