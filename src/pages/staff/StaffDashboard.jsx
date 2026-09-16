@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
-import { Loader2, ShoppingCart, DollarSign, Package, AlertTriangle, Star } from 'lucide-react';
+import { ShoppingCart, DollarSign, Package, AlertTriangle, Star } from 'lucide-react';
 
 const MOCK_ORDERS = [
   { id: "1", order_number: "ORD-9921", customer_email: "customer@example.com", total: 4999, payment_status: "Paid" },
@@ -14,35 +13,9 @@ const MOCK_PRODUCTS_SUMMARY = [
 ];
 
 export default function StaffDashboard() {
-  const [orders, setOrders] = useState(null);
-  const [products, setProducts] = useState(null);
-  const [pendingReviews, setPendingReviews] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const [o, p, r] = await Promise.all([
-          base44.entities.Order.list('-created_date', 100),
-          base44.entities.Product.list('-created_date', 200),
-          base44.entities.Review.filter({ approved: false }, '-created_date', 50),
-        ]);
-        if (!active) return;
-        setOrders(o && o.length > 0 ? o : MOCK_ORDERS);
-        setProducts(p && p.length > 0 ? p : MOCK_PRODUCTS_SUMMARY);
-        setPendingReviews(r || []);
-      } catch {
-        if (active) {
-          setOrders(MOCK_ORDERS);
-          setProducts(MOCK_PRODUCTS_SUMMARY);
-          setPendingReviews([]);
-        }
-      }
-    })();
-    return () => { active = false; };
-  }, []);
-
-  if (!orders || !products || pendingReviews === null) return <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div>;
+  const [orders] = useState(MOCK_ORDERS);
+  const [products] = useState(MOCK_PRODUCTS_SUMMARY);
+  const [pendingReviews] = useState([]);
 
   const revenue = orders.filter((o) => o.payment_status === 'Paid').reduce((s, o) => s + (o.total || 0), 0);
   const lowStock = products.filter((p) => (p.inventory_quantity ?? 0) <= 10);

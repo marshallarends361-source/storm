@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import ProductCard from '@/components/store/ProductCard';
 import { Loader2, Zap, Shield, Truck, CreditCard, Star, ArrowRight, Cpu, BatteryCharging, Gauge } from 'lucide-react';
 
@@ -19,7 +18,7 @@ const MOCK_PRODUCTS = [
     category: "E-Motos",
     price: 4999,
     inventory_quantity: 15,
-    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    images: [HERO],
     featured: true,
     is_new: true
   },
@@ -30,7 +29,7 @@ const MOCK_PRODUCTS = [
     category: "Electric Dirt Bikes",
     price: 3499,
     inventory_quantity: 8,
-    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    images: [HERO],
     is_bestseller: true,
     sale_price: 2999
   },
@@ -41,39 +40,15 @@ const MOCK_PRODUCTS = [
     category: "Electric Mountain Bikes",
     price: 2199,
     inventory_quantity: 20,
-    images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"],
+    images: [HERO],
     is_new: true
   }
 ];
 
 export default function Home() {
-  const [featured, setFeatured] = useState(null);
-  const [best, setBest] = useState(null);
-  const [fresh, setFresh] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const [f, b, n] = await Promise.all([
-          base44.entities.Product.filter({ featured: true }, '-created_date', 8),
-          base44.entities.Product.filter({ is_bestseller: true }, '-created_date', 8),
-          base44.entities.Product.filter({ is_new: true }, '-created_date', 8),
-        ]);
-        if (!active) return;
-        setFeatured(f && f.length > 0 ? f : MOCK_PRODUCTS.filter(p => p.featured));
-        setBest(b && b.length > 0 ? b : MOCK_PRODUCTS.filter(p => p.is_bestseller));
-        setFresh(n && n.length > 0 ? n : MOCK_PRODUCTS.filter(p => p.is_new));
-      } catch {
-        if (active) {
-          setFeatured(MOCK_PRODUCTS.filter(p => p.featured));
-          setBest(MOCK_PRODUCTS.filter(p => p.is_bestseller));
-          setFresh(MOCK_PRODUCTS.filter(p => p.is_new));
-        }
-      }
-    })();
-    return () => { active = false; };
-  }, []);
+  const [featured, setFeatured] = useState(MOCK_PRODUCTS.filter(p => p.featured));
+  const [best, setBest] = useState(MOCK_PRODUCTS.filter(p => p.is_bestseller));
+  const [fresh, setFresh] = useState(MOCK_PRODUCTS.filter(p => p.is_new));
 
   const Section = ({ title, subtitle, items, to }) => (
     items && items.length > 0 ? (
@@ -118,7 +93,6 @@ export default function Home() {
         </div>
       </section>
 
-      {!featured && !best && !fresh ? <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div> : null}
       <Section title="Featured" subtitle="Hand-picked flagship rides" items={featured} to="/shop" />
       <Section title="Best Sellers" subtitle="Loved by the thunder tribe" items={best} to="/shop" />
       <Section title="New Arrivals & Limited Releases" subtitle="Fresh from the forge" items={fresh} to="/shop" />
