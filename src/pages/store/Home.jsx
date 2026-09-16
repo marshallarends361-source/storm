@@ -14,9 +14,12 @@ const CATS = [
 export default function Home() {
   const [allProducts, setAllProducts] = useState(getRaijinProducts());
 
+  const sync = () => setAllProducts(getRaijinProducts());
+
   useEffect(() => {
-    // Re-sync after mount to ensure any session changes are caught
-    setAllProducts(getRaijinProducts());
+    sync();
+    window.addEventListener('raijin_products_updated', sync);
+    return () => window.removeEventListener('raijin_products_updated', sync);
   }, []);
 
   const featured = allProducts.filter(p => p.featured);

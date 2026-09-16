@@ -4,6 +4,8 @@ import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import StaffProductForm from '@/components/staff/StaffProductForm';
 import { getRaijinProducts } from '@/lib/raijin_products';
 
+import { deleteRaijinProduct, getRaijinProducts } from '@/lib/raijin_products';
+
 export default function StaffProducts() {
   const { toast } = useToast();
   const [products, setProducts] = useState(getRaijinProducts());
@@ -15,15 +17,14 @@ export default function StaffProducts() {
   };
 
   useEffect(() => {
-    load();
+    window.addEventListener('raijin_products_updated', load);
+    return () => window.removeEventListener('raijin_products_updated', load);
   }, []);
 
   const del = async (p) => {
     if (!confirm(`Delete "${p.name}"?`)) return;
     try {
-      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-      localStorage.setItem('raijin_products_v1', JSON.stringify(saved.filter(s => s.id !== p.id)));
-      load();
+      deleteRaijinProduct(p.id);
       toast({ title: 'Product removed' });
     } catch (e) {
       toast({ title: 'Delete failed', variant: 'destructive' });

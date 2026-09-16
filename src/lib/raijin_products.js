@@ -36,10 +36,12 @@ const MOCK_PRODUCTS = [
   }
 ];
 
+const STORAGE_KEY = 'raijin_products_v1';
+
 export const getRaijinProducts = () => {
   if (typeof window === 'undefined') return MOCK_PRODUCTS;
   try {
-    const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
     const mockIds = MOCK_PRODUCTS.map(m => m.id);
     const custom = saved.filter(p => !mockIds.includes(p.id));
     const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
@@ -47,4 +49,27 @@ export const getRaijinProducts = () => {
   } catch {
     return MOCK_PRODUCTS;
   }
+};
+
+export const saveRaijinProduct = (payload, isEdit) => {
+  if (typeof window === 'undefined') return;
+
+  const savedProducts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  let updated;
+  if (isEdit) {
+    updated = savedProducts.map(p => p.id === payload.id ? payload : p);
+    if (!savedProducts.find(p => p.id === payload.id)) updated.push(payload);
+  } else {
+    updated = [payload, ...savedProducts];
+  }
+
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+  window.dispatchEvent(new Event('raijin_products_updated'));
+};
+
+export const deleteRaijinProduct = (id) => {
+  if (typeof window === 'undefined') return;
+  const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(saved.filter(s => s.id !== id)));
+  window.dispatchEvent(new Event('raijin_products_updated'));
 };

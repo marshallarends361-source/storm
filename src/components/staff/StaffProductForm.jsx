@@ -13,6 +13,8 @@ const empty = { name: '', slug: '', price: '', sale_price: '', sku: '', inventor
 
 const slugify = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
+import { saveRaijinProduct } from '@/lib/raijin_products';
+
 export default function StaffProductForm({ product, onClose, onSaved }) {
   const [f, setF] = useState(empty);
   const [saving, setSaving] = useState(false);
@@ -69,16 +71,7 @@ export default function StaffProductForm({ product, onClose, onSaved }) {
     };
 
     try {
-      const savedProducts = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-      let updated;
-      if (isEdit) {
-        updated = savedProducts.map(p => p.id === product.id ? payload : p);
-        if (!savedProducts.find(p => p.id === product.id)) updated.push(payload);
-      } else {
-        updated = [payload, ...savedProducts];
-      }
-      localStorage.setItem('raijin_products_v1', JSON.stringify(updated));
-
+      saveRaijinProduct(payload, isEdit);
       toast({ title: isEdit ? 'Product updated' : 'Product created' });
       onSaved(payload);
     } catch (e2) { toast({ title: 'Save failed', description: e2.message, variant: 'destructive' }); }

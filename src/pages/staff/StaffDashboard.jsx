@@ -13,8 +13,12 @@ export default function StaffDashboard() {
   const [products, setProducts] = useState(getRaijinProducts());
   const [pendingReviews] = useState([]);
 
+  const sync = () => setProducts(getRaijinProducts());
+
   useEffect(() => {
-    setProducts(getRaijinProducts());
+    sync();
+    window.addEventListener('raijin_products_updated', sync);
+    return () => window.removeEventListener('raijin_products_updated', sync);
   }, []);
 
   const revenue = orders.filter((o) => o.payment_status === 'Paid').reduce((s, o) => s + (o.total || 0), 0);

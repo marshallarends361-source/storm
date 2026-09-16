@@ -17,8 +17,12 @@ export default function Shop() {
   const [sort, setSort] = useState('featured');
   const [allProducts, setAllProducts] = useState(getRaijinProducts());
 
+  const sync = () => setAllProducts(getRaijinProducts());
+
   useEffect(() => {
-    setAllProducts(getRaijinProducts());
+    sync();
+    window.addEventListener('raijin_products_updated', sync);
+    return () => window.removeEventListener('raijin_products_updated', sync);
   }, []);
 
   let filtered = allProducts;

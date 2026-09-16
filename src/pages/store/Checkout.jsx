@@ -84,6 +84,10 @@ export default function Checkout() {
 
       <form onSubmit={pay} className="grid md:grid-cols-3 gap-6">
         <div className="md:col-span-2 space-y-6">
+          <div className="mb-4 p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg text-xs text-blue-300 leading-relaxed">
+            <span className="font-bold">🏁 REAL PAYMENTS INFO:</span> Users can select Card, Apple Pay, or Cash App.
+            <br/>To process real money, please add your <code className="bg-blue-500/20 px-1 rounded text-white">STRIPE_SECRET_KEY</code> to Vercel Environment Variables.
+          </div>
           <div className="glass-panel rounded-xl p-5 border-primary/20">
             <h2 className="font-semibold text-sm mb-4 flex items-center gap-2"><Zap className="w-4 h-4 text-primary" /> Delivery Info</h2>
             <div className="grid sm:grid-cols-2 gap-3 mb-3">
