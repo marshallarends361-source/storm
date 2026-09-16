@@ -1,46 +1,32 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
-import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoadingAuth, setIsLoadingAuth] = useState(true);
-  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(true);
+  const [user, setUser] = useState({
+    email: 'marshallarends361@gmail.com',
+    first_name: 'Marshall',
+    last_name: 'Arends',
+    full_name: 'Marshall Arends',
+    role: 'admin'
+  });
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+  const [isLoadingAuth, setIsLoadingAuth] = useState(false);
+  const [isLoadingPublicSettings, setIsLoadingPublicSettings] = useState(false);
   const [authError, setAuthError] = useState(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [appPublicSettings, setAppPublicSettings] = useState(null); // Contains only { id, public_settings }
+  const [authChecked, setAuthChecked] = useState(true);
+  const [appPublicSettings, setAppPublicSettings] = useState(null);
 
   useEffect(() => {
-    checkAppState();
+    // Already initialized with hardcoded owner values to prevent grey screen crashes on Vercel
   }, []);
 
   const checkAppState = async () => {
-    try {
-      setIsLoadingPublicSettings(false);
-      setIsLoadingAuth(false);
-      setAuthChecked(true);
-      setIsAuthenticated(true);
-      setUser({
-        email: 'marshallarends361@gmail.com',
-        first_name: 'Marshall',
-        last_name: 'Arends',
-        full_name: 'Marshall Arends',
-        role: 'admin' // Set to 'admin' to pass any internal dashboard checks needing staff/admin permissions
-      });
-      setAuthError(null);
-    } catch (error) {
-      console.error('Unexpected error:', error);
-      setAuthError({
-        type: 'unknown',
-        message: error.message || 'An unexpected error occurred'
-      });
-      setIsLoadingPublicSettings(false);
-      setIsLoadingAuth(false);
-    }
+    setIsLoadingPublicSettings(false);
+    setIsLoadingAuth(false);
+    setAuthChecked(true);
   };
 
   const checkUserAuth = async () => {
