@@ -1,29 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, DollarSign, Package, AlertTriangle, Star } from 'lucide-react';
+import { getRaijinProducts } from '@/lib/raijin_products';
 
 const MOCK_ORDERS = [
   { id: "1", order_number: "ORD-9921", customer_email: "customer@example.com", total: 4999, payment_status: "Paid" },
   { id: "2", order_number: "ORD-7742", customer_email: "test_rider@gmail.com", total: 2999, payment_status: "Paid" }
 ];
 
-const MOCK_PRODUCTS_SUMMARY = [
-  { id: "1", name: "Raijin Apex Pro E-Moto", inventory_quantity: 15 },
-  { id: "2", name: "Raijin Thunder Dirt Bike", inventory_quantity: 2 }
-];
-
 export default function StaffDashboard() {
-  const [orders, setOrders] = useState(MOCK_ORDERS);
-  const [products, setProducts] = useState(MOCK_PRODUCTS_SUMMARY);
-  const [pendingReviews, setPendingReviews] = useState([]);
+  const [orders] = useState(MOCK_ORDERS);
+  const [products, setProducts] = useState(getRaijinProducts());
+  const [pendingReviews] = useState([]);
 
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-      if (saved.length > 0) {
-        setProducts(saved.map(p => ({ id: p.id, name: p.name, inventory_quantity: p.inventory_quantity })));
-      }
-    } catch { /* ignore */ }
+    setProducts(getRaijinProducts());
   }, []);
 
   const revenue = orders.filter((o) => o.payment_status === 'Paid').reduce((s, o) => s + (o.total || 0), 0);

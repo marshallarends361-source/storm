@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ProductCard from '@/components/store/ProductCard';
+import { getRaijinProducts } from '@/lib/raijin_products';
 import { SlidersHorizontal } from 'lucide-react';
 
 const CATEGORIES = [
@@ -9,66 +10,18 @@ const CATEGORIES = [
   'Replacement Parts', 'Performance Parts', 'Accessories', 'Helmets & Safety Gear',
 ];
 
-const HERO = 'https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png';
-
-const MOCK_PRODUCTS = [
-  {
-    id: "1",
-    name: "Raijin Apex Pro E-Moto",
-    slug: "raijin-apex-pro",
-    category: "E-Motos",
-    price: 4999,
-    inventory_quantity: 15,
-    images: [HERO],
-    featured: true,
-    is_new: true,
-    description: "Ultimate flagship electric supermoto with extreme peak power."
-  },
-  {
-    id: "2",
-    name: "Raijin Thunder Dirt Bike",
-    slug: "raijin-thunder-dirt",
-    category: "Electric Dirt Bikes",
-    price: 3499,
-    inventory_quantity: 8,
-    images: [HERO],
-    is_bestseller: true,
-    sale_price: 2999,
-    description: "High torque electric dirt bike built for rough offroad trails."
-  },
-  {
-    id: "3",
-    name: "Raijin Storm Mountain Bike",
-    slug: "raijin-storm-mtb",
-    category: "Electric Mountain Bikes",
-    price: 2199,
-    inventory_quantity: 20,
-    images: [HERO],
-    is_new: true,
-    description: "Premium carbon frame trail tracker with intuitive pedal assist."
-  }
-];
-
 export default function Shop() {
   const [params, setParams] = useSearchParams();
   const cat = params.get('cat') || '';
   const q = params.get('q') || '';
   const [sort, setSort] = useState('featured');
-  const [allProducts, setAllProducts] = useState(MOCK_PRODUCTS);
+  const [allProducts, setAllProducts] = useState(getRaijinProducts());
 
   useEffect(() => {
-    // Load from session storage safely after mount to prevent build crashes
-    try {
-      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-      const mockIds = MOCK_PRODUCTS.map(m => m.id);
-      const custom = saved.filter(p => !mockIds.includes(p.id));
-      const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
-      setAllProducts([...custom, ...updatedMocks]);
-    } catch { /* ignore */ }
+    setAllProducts(getRaijinProducts());
   }, []);
 
   let filtered = allProducts;
-
   if (cat) filtered = filtered.filter((p) => p.category === cat);
   if (q) filtered = filtered.filter((p) => (p.name + p.description + p.category).toLowerCase().includes(q.toLowerCase()));
   if (sort === 'price-asc') filtered = [...filtered].sort((a, b) => (a.sale_price ?? a.price) - (b.sale_price ?? b.price));

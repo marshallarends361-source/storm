@@ -69,7 +69,6 @@ export default function StaffProductForm({ product, onClose, onSaved }) {
     };
 
     try {
-      // Simulate saving to local storage to make the changes persist in the session
       const savedProducts = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
       let updated;
       if (isEdit) {
@@ -143,48 +142,6 @@ export default function StaffProductForm({ product, onClose, onSaved }) {
           <DialogFooter className="mt-4">
             <Button type="button" variant="outline" className="border-slate-700 text-slate-300 hover:bg-slate-800" onClick={onClose}>Cancel</Button>
             <Button type="submit" className="bg-primary hover:bg-primary/90" disabled={saving}>{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Product'}</Button>
-          </DialogFooter>
-        </form>
-      </DialogContent>
-    </Dialog>
-  );
-}
-
-  return (
-    <Dialog open onOpenChange={onClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
-        <DialogHeader><DialogTitle>{isEdit ? 'Edit Product' : 'New Product'}</DialogTitle></DialogHeader>
-        <form onSubmit={save} className="space-y-3">
-          <div><Label className="text-xs">Name *</Label><Input className="mt-1" value={f.name} onChange={(e) => set('name', e.target.value)} required /></div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="text-xs">Price *</Label><Input type="number" step="0.01" className="mt-1" value={f.price} onChange={(e) => set('price', e.target.value)} required /></div>
-            <div><Label className="text-xs">Sale Price</Label><Input type="number" step="0.01" className="mt-1" value={f.sale_price} onChange={(e) => set('sale_price', e.target.value)} /></div>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="text-xs">SKU</Label><Input className="mt-1" value={f.sku} onChange={(e) => set('sku', e.target.value)} /></div>
-            <div><Label className="text-xs">Inventory</Label><Input type="number" className="mt-1" value={f.inventory_quantity} onChange={(e) => set('inventory_quantity', e.target.value)} /></div>
-          </div>
-          <div><Label className="text-xs">Category</Label>
-            <select value={f.category} onChange={(e) => set('category', e.target.value)} className={input + ' mt-1'}>
-              {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-          </div>
-          <div><Label className="text-xs">Description</Label><Textarea rows={3} className="mt-1" value={f.description} onChange={(e) => set('description', e.target.value)} /></div>
-          <div><Label className="text-xs">Images (one URL per line)</Label><Textarea rows={2} className="mt-1 font-mono text-xs" value={f.images} onChange={(e) => set('images', e.target.value)} /></div>
-          <div className="grid grid-cols-2 gap-2">
-            <div><Label className="text-xs">Motor Power</Label><Input className="mt-1" value={f.motor_power} onChange={(e) => set('motor_power', e.target.value)} /></div>
-            <div><Label className="text-xs">Top Speed</Label><Input className="mt-1" value={f.top_speed} onChange={(e) => set('top_speed', e.target.value)} /></div>
-            <div><Label className="text-xs">Est. Range</Label><Input className="mt-1" value={f.estimated_range} onChange={(e) => set('estimated_range', e.target.value)} /></div>
-            <div><Label className="text-xs">Weight</Label><Input className="mt-1" value={f.weight} onChange={(e) => set('weight', e.target.value)} /></div>
-          </div>
-          <div className="flex flex-wrap gap-3 pt-1">
-            {[['featured', 'Featured'], ['is_new', 'New'], ['is_bestseller', 'Bestseller'], ['is_limited', 'Limited']].map(([k, label]) => (
-              <label key={k} className="flex items-center gap-1.5 text-xs cursor-pointer"><input type="checkbox" checked={f[k]} onChange={(e) => set(k, e.target.checked)} className="accent-primary" /> {label}</label>
-            ))}
-          </div>
-          <DialogFooter>
-            <Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-            <Button type="submit" disabled={saving}>{saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save'}</Button>
           </DialogFooter>
         </form>
       </DialogContent>

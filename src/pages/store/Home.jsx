@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ProductCard from '@/components/store/ProductCard';
-import { Loader2, Zap, Shield, Truck, CreditCard, Star, ArrowRight, Cpu, BatteryCharging, Gauge } from 'lucide-react';
+import { getRaijinProducts } from '@/lib/raijin_products';
+import { Zap, Shield, Truck, CreditCard, Star, ArrowRight, Cpu, BatteryCharging, Gauge } from 'lucide-react';
 
 const HERO = 'https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png';
 
@@ -10,51 +11,12 @@ const CATS = [
   { name: 'Commuter E-Bikes', icon: Truck }, { name: 'Fat-Tire E-Bikes', icon: BatteryCharging }, { name: 'Kids E-Bikes', icon: Star },
 ];
 
-const MOCK_PRODUCTS = [
-  {
-    id: "1",
-    name: "Raijin Apex Pro E-Moto",
-    slug: "raijin-apex-pro",
-    category: "E-Motos",
-    price: 4999,
-    inventory_quantity: 15,
-    images: [HERO],
-    featured: true,
-    is_new: true
-  },
-  {
-    id: "2",
-    name: "Raijin Thunder Dirt Bike",
-    slug: "raijin-thunder-dirt",
-    category: "Electric Dirt Bikes",
-    price: 3499,
-    inventory_quantity: 8,
-    images: [HERO],
-    is_bestseller: true,
-    sale_price: 2999
-  },
-  {
-    id: "3",
-    name: "Raijin Storm Mountain Bike",
-    slug: "raijin-storm-mtb",
-    category: "Electric Mountain Bikes",
-    price: 2199,
-    inventory_quantity: 20,
-    images: [HERO],
-    is_new: true
-  }
-];
-
 export default function Home() {
-  const [allProducts, setAllProducts] = useState(MOCK_PRODUCTS);
+  const [allProducts, setAllProducts] = useState(getRaijinProducts());
 
   useEffect(() => {
-    // Load from session storage safely after mount to prevent build crashes
-    const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-    const mockIds = MOCK_PRODUCTS.map(m => m.id);
-    const custom = saved.filter(p => !mockIds.includes(p.id));
-    const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
-    setAllProducts([...custom, ...updatedMocks]);
+    // Re-sync after mount to ensure any session changes are caught
+    setAllProducts(getRaijinProducts());
   }, []);
 
   const featured = allProducts.filter(p => p.featured);
