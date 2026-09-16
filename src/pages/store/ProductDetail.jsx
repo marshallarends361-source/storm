@@ -74,7 +74,8 @@ export default function ProductDetail() {
   const { user } = useAuth();
   const { toast } = useToast();
 
-  const product = MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug);
+  const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+  const product = saved.find(m => m.slug === slug || m.id === slug) || MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug);
 
   if (!product) return <div className="text-center py-24"><p className="text-muted-foreground">Product not found.</p><Link to="/shop" className="text-primary text-sm mt-2 inline-block">← Back to shop</Link></div>;
 

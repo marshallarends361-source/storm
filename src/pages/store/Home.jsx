@@ -46,9 +46,16 @@ const MOCK_PRODUCTS = [
 ];
 
 export default function Home() {
-  const [featured, setFeatured] = useState(MOCK_PRODUCTS.filter(p => p.featured));
-  const [best, setBest] = useState(MOCK_PRODUCTS.filter(p => p.is_bestseller));
-  const [fresh, setFresh] = useState(MOCK_PRODUCTS.filter(p => p.is_new));
+  // Load from session storage to include any newly imported owner products
+  const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+  const mockIds = MOCK_PRODUCTS.map(m => m.id);
+  const custom = saved.filter(p => !mockIds.includes(p.id));
+  const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
+  const allProducts = [...custom, ...updatedMocks];
+
+  const featured = allProducts.filter(p => p.featured);
+  const best = allProducts.filter(p => p.is_bestseller);
+  const fresh = allProducts.filter(p => p.is_new);
 
   const Section = ({ title, subtitle, items, to }) => (
     items && items.length > 0 ? (

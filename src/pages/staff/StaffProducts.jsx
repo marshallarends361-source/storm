@@ -11,23 +11,35 @@ const MOCK_PRODUCTS_LIST = [
 
 export default function StaffProducts() {
   const { toast } = useToast();
-  const [products, setProducts] = useState(MOCK_PRODUCTS_LIST);
+  const [products, setProducts] = useState([]);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
-  const load = async () => {
-    setProducts(MOCK_PRODUCTS_LIST);
+  const load = () => {
+    // Merge base mock products with any products added/edited during this session in local storage
+    const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+    const mockIds = MOCK_PRODUCTS_LIST.map(m => m.id);
+    const custom = saved.filter(p => !mockIds.includes(p.id));
+
+    // Update any mocks that were edited
+    const updatedMocks = MOCK_PRODUCTS_LIST.map(m => {
+      const edit = saved.find(s => s.id === m.id);
+      return edit || m;
+    });
+
+    setProducts([...custom, ...updatedMocks]);
   };
   useEffect(() => { load(); }, []);
 
   const del = async (p) => {
     if (!confirm(`Delete "${p.name}"?`)) return;
     try {
-      // Filter out the product from the current view locally to completely fix the 404 block deletion issue on Vercel
+      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+      localStorage.setItem('raijin_products_v1', JSON.stringify(saved.filter(s => s.id !== p.id)));
       setProducts(products.filter((x) => x.id !== p.id));
-      toast({ title: 'Product deleted successfully' });
+      toast({ title: 'Product removed' });
     } catch (e) {
-      toast({ title: 'Delete failed', description: e.message, variant: 'destructive' });
+      toast({ title: 'Delete failed', variant: 'destructive' });
     }
   };
 

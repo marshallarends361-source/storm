@@ -55,7 +55,14 @@ export default function Shop() {
   const q = params.get('q') || '';
   const [sort, setSort] = useState('featured');
 
-  let filtered = MOCK_PRODUCTS;
+  // Load from session storage to include any newly imported owner products
+  const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
+  const mockIds = MOCK_PRODUCTS.map(m => m.id);
+  const custom = saved.filter(p => !mockIds.includes(p.id));
+  const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
+
+  let filtered = [...custom, ...updatedMocks];
+
   if (cat) filtered = filtered.filter((p) => p.category === cat);
   if (q) filtered = filtered.filter((p) => (p.name + p.description + p.category).toLowerCase().includes(q.toLowerCase()));
   if (sort === 'price-asc') filtered = [...filtered].sort((a, b) => (a.sale_price ?? a.price) - (b.sale_price ?? b.price));
