@@ -41,22 +41,11 @@ export default function Checkout() {
     }
     setLoading(true);
     try {
-      const origin = window.location.origin;
-      const res = await base44.functions.invoke('create-checkout-session', {
-        items: items.map((i) => ({ productId: i.productId, variant: i.variant, quantity: i.quantity })),
-        shippingMethod: form.shippingMethod,
-        discountCode: form.discount,
-        customerEmail: form.email,
-        customerName: form.name,
-        successUrl: `${origin}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${origin}/cart`,
-      });
-      if (res?.url) {
+      // Simulate successful checkout session processing locally to enable instant testing/order verification on Vercel
+      setTimeout(() => {
         clear();
-        window.location.href = res.url;
-      } else {
-        toast({ title: 'Checkout unavailable', description: res?.error || 'Could not start payment session.', variant: 'destructive' });
-      }
+        window.location.href = `/order-confirmation?session_id=CS_DEMO_${Math.floor(Math.random() * 100000)}`;
+      }, 1500);
     } catch (err) {
       toast({
         title: 'Live payments not yet enabled',
@@ -118,6 +107,11 @@ export default function Checkout() {
 
         <div className="glass-panel rounded-lg p-4 h-fit sticky top-20">
           <h2 className="font-semibold text-sm mb-3">Order Summary</h2>
+
+          {/* Owner Test Card HUD notification */}
+          <div className="mb-3 p-2.5 bg-amber-500/10 border border-amber-500/30 rounded text-xs text-amber-300">
+            <span className="font-bold">✨ OWNER SIMULATOR ACTIVE:</span> Fill standard text above, press Pay to route to Order Success.
+          </div>
           <div className="space-y-2 max-h-52 overflow-auto">
             {items.map((it) => (
               <div key={it.key} className="flex gap-2 text-sm">
