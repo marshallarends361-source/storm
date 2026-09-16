@@ -37,14 +37,20 @@ const MOCK_PRODUCTS = [
 ];
 
 const STORAGE_KEY = 'raijin_products_v1';
+const DELETED_KEY = 'raijin_deleted_mocks_v1';
 
 export const getRaijinProducts = () => {
   if (typeof window === 'undefined') return MOCK_PRODUCTS;
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    const deletedIds = JSON.parse(localStorage.getItem(DELETED_KEY) || '[]');
+
     const mockIds = MOCK_PRODUCTS.map(m => m.id);
     const custom = saved.filter(p => !mockIds.includes(p.id));
-    const updatedMocks = MOCK_PRODUCTS.map(m => saved.find(s => s.id === m.id) || m);
+
+    const activeMocks = MOCK_PRODUCTS.filter(m => !deletedIds.includes(m.id));
+    const updatedMocks = activeMocks.map(m => saved.find(s => s.id === m.id) || m);
+
     return [...custom, ...updatedMocks];
   } catch {
     return MOCK_PRODUCTS;
@@ -69,7 +75,19 @@ export const saveRaijinProduct = (payload, isEdit) => {
 
 export const deleteRaijinProduct = (id) => {
   if (typeof window === 'undefined') return;
+
+  // 1. Remove from saved modifications
   const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
   localStorage.setItem(STORAGE_KEY, JSON.stringify(saved.filter(s => s.id !== id)));
+
+  // 2. If it's a mock product, mark it as deleted so it doesn't come back
+  const mockIds = MOCK_PRODUCTS.map(m => m.id);
+  if (mockIds.includes(id)) {
+    const deletedIds = JSON.parse(localStorage.getItem(DELETED_KEY) || '[]');
+    if (!deletedIds.includes(id)) {
+      localStorage.setItem(DELETED_KEY, JSON.stringify([...deletedIds, id]));
+    }
+  }
+
   window.dispatchEvent(new Event('raijin_products_updated'));
 };
