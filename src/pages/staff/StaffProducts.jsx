@@ -4,6 +4,12 @@ import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import StaffProductForm from '@/components/staff/StaffProductForm';
 
+const MOCK_PRODUCTS_LIST = [
+  { id: "1", name: "Raijin Apex Pro E-Moto", category: "E-Motos", price: 4999, inventory_quantity: 15, images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"] },
+  { id: "2", name: "Raijin Thunder Dirt Bike", category: "Electric Dirt Bikes", price: 3499, inventory_quantity: 2, images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"] },
+  { id: "3", name: "Raijin Storm Mountain Bike", category: "Electric Mountain Bikes", price: 2199, inventory_quantity: 20, images: ["https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png"] }
+];
+
 export default function StaffProducts() {
   const { toast } = useToast();
   const [products, setProducts] = useState(null);
@@ -12,8 +18,11 @@ export default function StaffProducts() {
 
   const load = async () => {
     setProducts(null);
-    try { setProducts(await base44.entities.Product.list('-created_date', 200)); }
-    catch { setProducts([]); }
+    try {
+      const list = await base44.entities.Product.list('-created_date', 200);
+      setProducts(list && list.length > 0 ? list : MOCK_PRODUCTS_LIST);
+    }
+    catch { setProducts(MOCK_PRODUCTS_LIST); }
   };
   useEffect(() => { load(); }, []);
 
