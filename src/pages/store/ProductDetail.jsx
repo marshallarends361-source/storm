@@ -1,66 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useCart } from '@/lib/cartContext';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { stockBadge } from '@/components/store/ProductCard';
+import { getRaijinProducts } from '@/lib/raijin_products';
 import { ShoppingCart, Star, Truck, Shield, Zap, ChevronLeft, Minus, Plus } from 'lucide-react';
 
 const HERO = 'https://media.base44.com/images/public/6a51082b02e209c4da4a908c/a7c93a724_generated_image.png';
-
-const MOCK_PRODUCTS = [
-  {
-    id: "1",
-    name: "Raijin Apex Pro E-Moto",
-    slug: "raijin-apex-pro",
-    category: "E-Motos",
-    price: 4999,
-    inventory_quantity: 15,
-    images: [HERO],
-    featured: true,
-    is_new: true,
-    description: "The Raijin Apex Pro is the ultimate flagship electric supermoto. Engineered for extreme peak power and lightning-fast acceleration, it features a lightweight carbon-fiber reinforced frame and a high-torque 15kW motor.",
-    motor_power: "15kW Peak",
-    top_speed: "75 mph",
-    estimated_range: "80 miles",
-    weight: "185 lbs",
-    battery_voltage: "72V",
-    charge_time: "3.5 hours",
-    warranty: "2-year powertrain"
-  },
-  {
-    id: "2",
-    name: "Raijin Thunder Dirt Bike",
-    slug: "raijin-thunder-dirt",
-    category: "Electric Dirt Bikes",
-    price: 3499,
-    inventory_quantity: 8,
-    images: [HERO],
-    is_bestseller: true,
-    sale_price: 2999,
-    description: "Tear through the trails with the Raijin Thunder. This high-torque electric dirt bike is built for the roughest terrain, featuring long-travel adjustable suspension and aggressive knobby tires.",
-    motor_power: "8kW Peak",
-    top_speed: "55 mph",
-    estimated_range: "45 miles (Off-road)",
-    weight: "145 lbs",
-    charge_time: "2.5 hours"
-  },
-  {
-    id: "3",
-    name: "Raijin Storm Mountain Bike",
-    slug: "raijin-storm-mtb",
-    category: "Electric Mountain Bikes",
-    price: 2199,
-    inventory_quantity: 20,
-    images: [HERO],
-    is_new: true,
-    description: "The Storm MTB combines the agility of a traditional mountain bike with the raw power of electric assist. Perfect for climbing steep technical trails with ease.",
-    motor_power: "750W Mid-drive",
-    top_speed: "28 mph (Assist)",
-    estimated_range: "50 miles",
-    weight: "52 lbs"
-  }
-];
 
 export default function ProductDetail() {
   const { slug } = useParams();
@@ -71,24 +18,21 @@ export default function ProductDetail() {
   ]);
   const [newReview, setNewReview] = useState({ rating: 5, text: '' });
   const { add } = useCart();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [product, setProduct] = useState(null);
 
   useEffect(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('raijin_products_v1') || '[]');
-      const found = saved.find(m => m.slug === slug || m.id === slug) || MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug);
-      setProduct(found || null);
-    } catch {
-      setProduct(MOCK_PRODUCTS.find(m => m.slug === slug || m.id === slug) || null);
-    }
+    const products = getRaijinProducts();
+    const found = products.find(m => m.slug === slug || m.id === slug);
+    setProduct(found || null);
   }, [slug]);
 
   if (!product) return <div className="text-center py-24"><p className="text-muted-foreground">Product not found.</p><Link to="/shop" className="text-primary text-sm mt-2 inline-block">← Back to shop</Link></div>;
 
   const onSale = product.sale_price != null && product.sale_price > 0 && product.sale_price < product.price;
   const badge = stockBadge(product.inventory_quantity ?? 0);
-  const images = product.images?.length ? product.images : [];
+  const images = product.images?.length ? product.images : [HERO];
   const specs = [
     ['Motor Power', product.motor_power], ['Battery Voltage', product.battery_voltage], ['Battery Capacity', product.battery_capacity],
     ['Estimated Range', product.estimated_range], ['Top Speed', product.top_speed], ['Charge Time', product.charge_time],
@@ -106,7 +50,7 @@ export default function ProductDetail() {
     if (!newReview.text.trim()) return;
     const simulatedReview = {
       id: Math.random().toString(),
-      customer_name: "Marshall Arends",
+      customer_name: user?.full_name || "Marshall Arends",
       rating: newReview.rating,
       text: newReview.text
     };
@@ -114,8 +58,6 @@ export default function ProductDetail() {
     setNewReview({ rating: 5, text: '' });
     toast({ title: 'Review submitted', description: 'Thank you for your feedback!' });
   };
-
-  const avgRating = reviews.length ? (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1) : null;
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-6">

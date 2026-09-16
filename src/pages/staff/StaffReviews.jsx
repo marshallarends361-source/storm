@@ -10,57 +10,84 @@ const MOCK_REVIEWS = [
 
 export default function StaffReviews() {
   const { toast } = useToast();
-  const [reviews, setReviews] = useState(MOCK_REVIEWS);
+  const [reviews, setReviews] = useState([]);
   const [tab, setTab] = useState('pending');
 
-  const load = async () => {
-    setReviews(MOCK_REVIEWS);
+  const load = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('raijin_reviews_v1') || '[]');
+      // Merge mocks with any session changes
+      const mockIds = MOCK_REVIEWS.map(m => m.id);
+      const custom = saved.filter(r => !mockIds.includes(r.id));
+      const updatedMocks = MOCK_REVIEWS.map(m => saved.find(s => s.id === m.id) || m);
+      setReviews([...custom, ...updatedMocks]);
+    } catch {
+      setReviews(MOCK_REVIEWS);
+    }
   };
-  useEffect(() => { load(); }, []);
 
-  const approve = async (r) => {
-    // Simulate local review approval to bypass 404 database error on Vercel
-    setReviews(reviews.map((x) => (x.id === r.id ? { ...x, approved: true } : x)));
+  useEffect(() => {
+    load();
+  }, []);
+
+  const saveToStorage = (updatedList) => {
+    localStorage.setItem('raijin_reviews_v1', JSON.stringify(updatedList));
+    setReviews(updatedList);
+  };
+
+  const approve = (r) => {
+    const updated = reviews.map((x) => (x.id === r.id ? { ...x, approved: true } : x));
+    saveToStorage(updated);
     toast({ title: 'Review approved' });
   };
 
-  const del = async (r) => {
+  const del = (r) => {
     if (!confirm('Delete this review?')) return;
-    setReviews(reviews.filter((x) => x.id !== r.id));
+    const updated = reviews.filter((x) => x.id !== r.id);
+    saveToStorage(updated);
     toast({ title: 'Review deleted' });
   };
 
-  const filtered = reviews ? (tab === 'pending' ? reviews.filter((r) => !r.approved) : reviews.filter((r) => r.approved)) : [];
+  const filtered = reviews.filter((r) => tab === 'pending' ? !r.approved : r.approved);
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="font-display text-xl md:text-2xl font-bold">Reviews</h1>
-        <div className="flex gap-1 glass-panel rounded-lg p-1">
-          <button onClick={() => setTab('pending')} className={`px-3 py-1.5 rounded-md text-xs font-medium ${tab === 'pending' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>Pending</button>
-          <button onClick={() => setTab('approved')} className={`px-3 py-1.5 rounded-md text-xs font-medium ${tab === 'approved' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground'}`}>Approved</button>
+    <div className="animate-in fade-in duration-500">
+      <div className="flex items-center justify-between mb-6">
+        <h1 className="font-display text-2xl font-bold tracking-tight">Review Moderation</h1>
+        <div className="flex gap-1 glass-panel rounded-lg p-1 border-slate-800">
+          <button onClick={() => setTab('pending')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${tab === 'pending' ? 'bg-primary text-primary-foreground shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Pending</button>
+          <button onClick={() => setTab('approved')} className={`px-4 py-1.5 rounded-md text-xs font-bold uppercase tracking-wider transition-all ${tab === 'approved' ? 'bg-primary text-primary-foreground shadow-lg' : 'text-slate-500 hover:text-slate-300'}`}>Approved</button>
         </div>
       </div>
 
-      {!reviews ? <div className="flex justify-center py-20"><Loader2 className="w-6 h-6 animate-spin text-primary" /></div> : filtered.length === 0 ? <p className="text-sm text-muted-foreground">No {tab} reviews.</p> : (
-        <div className="space-y-2">
-          {filtered.map((r) => (
-            <div key={r.id} className="glass-panel rounded-lg p-3">
-              <div className="flex items-center justify-between">
-                <div className="text-sm font-medium">{r.customer_name || 'Anonymous'}</div>
-                <div className="flex items-center gap-2">
-                  <span className="flex">{[1, 2, 3, 4, 5].map((i) => <Star key={i} className={`w-3.5 h-3.5 ${i <= r.rating ? 'fill-amber-400 text-amber-400' : 'text-muted'}`} />)}</span>
-                </div>
-              </div>
-              <p className="text-sm text-muted-foreground mt-1">{r.text}</p>
-              <div className="flex gap-2 mt-2">
-                {!r.approved && <button onClick={() => approve(r)} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500/25"><Check className="w-3.5 h-3.5" /> Approve</button>}
-                <button onClick={() => del(r)} className="flex items-center gap-1 text-xs px-2.5 py-1 rounded-md bg-destructive/15 text-destructive hover:bg-destructive/25"><Trash2 className="w-3.5 h-3.5" /> Delete</button>
+      <div className="space-y-3">
+        {filtered.length === 0 ? (
+          <div className="glass-panel rounded-xl p-12 text-center border-slate-800">
+            <Star className="w-8 h-8 mx-auto text-slate-700 mb-3" />
+            <p className="text-slate-500 text-sm font-medium">No {tab} reviews found.</p>
+          </div>
+        ) : filtered.map((r) => (
+          <div key={r.id} className="glass-panel rounded-xl p-4 border-slate-800 hover:border-primary/20 transition-colors">
+            <div className="flex items-center justify-between mb-2">
+              <div className="text-sm font-bold text-white">{r.customer_name}</div>
+              <div className="flex text-amber-500">
+                {[1, 2, 3, 4, 5].map((i) => <Star key={i} className={`w-3.5 h-3.5 ${i <= r.rating ? 'fill-current' : 'text-slate-700'}`} />)}
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            <p className="text-sm text-slate-400 leading-relaxed italic">"{r.text}"</p>
+            <div className="flex gap-2 mt-4">
+              {!r.approved && (
+                <button onClick={() => approve(r)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
+                  <Check className="w-3.5 h-3.5" /> Approve
+                </button>
+              )}
+              <button onClick={() => del(r)} className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1.5 rounded bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20 transition-all">
+                <Trash2 className="w-3.5 h-3.5" /> Delete
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
