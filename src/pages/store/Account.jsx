@@ -41,9 +41,6 @@ export default function Account() {
         const ords = await base44.entities.Order.filter({ customer_email: user.email }, '-created_date', 50);
         if (active) setOrders(ords && ords.length > 0 ? ords : MOCK_ORDERS);
       } catch { if (active) setOrders(MOCK_ORDERS); }
-
-      // Load other data or use defaults
-      setIsLoadingProducts(true);
     })();
     return () => { active = false; };
   }, [user]);
