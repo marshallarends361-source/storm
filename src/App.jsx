@@ -8,6 +8,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { CartProvider } from '@/lib/cartContext';
+import { Analytics } from '@vercel/analytics/react';
 
 import Login from '@/pages/Login';
 import Register from '@/pages/Register';
@@ -82,6 +83,7 @@ function App() {
           </CartProvider>
         </Router>
         <Toaster />
+        <Analytics />
       </QueryClientProvider>
     </AuthProvider>
   )
