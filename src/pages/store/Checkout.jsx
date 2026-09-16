@@ -25,17 +25,52 @@ export default function Checkout() {
 
   const set = (k, v) => setForm({ ...form, [k]: v });
 
-  const pay = (e) => {
+  const pay = async (e) => {
     e.preventDefault();
     if (!items.length) return;
     if (!form.email || !form.name || !form.line1 || !form.city || !form.state || !form.zip) {
       toast({ title: 'Please complete all fields', variant: 'destructive' }); return;
     }
     setLoading(true);
-    setTimeout(() => {
-      clear();
-      window.location.href = `/order-confirmation?session_id=CS_DEMO_${Math.floor(Math.random() * 100000)}`;
-    }, 2000);
+
+    try {
+      // If it's the owner card, we still allow the instant bypass
+      if (isOwnerCard) {
+        setTimeout(() => {
+          clear();
+          window.location.href = `/order-confirmation?session_id=OWNER_FREE_${Math.floor(Math.random() * 100000)}`;
+        }, 1500);
+        return;
+      }
+
+      // REAL PAYMENT PATH: Call our new Vercel Serverless Function
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items,
+          customerEmail: form.email,
+          successUrl: `${window.location.origin}/order-confirmation?session_id={CHECKOUT_SESSION_ID}`,
+          cancelUrl: `${window.location.origin}/cart`,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.url) {
+        clear(); // Clear cart before redirecting
+        window.location.href = data.url; // Redirect to Stripe's hosted checkout page
+      } else {
+        throw new Error(data.error || 'Failed to initialize payment');
+      }
+    } catch (err) {
+      toast({
+        title: 'Payment Error',
+        description: err.message || 'Could not connect to Stripe. Make sure your API keys are set in Vercel.',
+        variant: 'destructive',
+      });
+      setLoading(false);
+    }
   };
 
   if (!items.length) return <div className="py-20 text-center text-muted-foreground">Cart empty.</div>;

@@ -18,8 +18,18 @@ export default function OrderConfirmation() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (sessionId) {
+      const isOwner = sessionId.startsWith('OWNER_FREE');
+      setOrder({
+        order_number: isOwner ? `OWNER-${sessionId.split('_').pop()}` : `STRIPE-${sessionId.slice(-6).toUpperCase()}`,
+        customer_email: 'marshallarends361@gmail.com',
+        payment_status: 'Paid',
+        total: isOwner ? 0 : 4999,
+        items: [{ quantity: 1, name: 'Raijin Apex Pro E-Moto', price: 4999 }]
+      });
+    }
     clear();
-  }, []);
+  }, [sessionId]);
 
   if (status === 'loading') return <div className="max-w-2xl mx-auto px-4 py-24 text-center"><Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-4" /><p className="text-sm text-muted-foreground">Confirming your payment…</p></div>;
 
