@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Plus, Trash2, Power } from 'lucide-react';
 
@@ -10,17 +9,12 @@ const MOCK_DISCOUNTS = [
 
 export default function StaffDiscounts() {
   const { toast } = useToast();
-  const [codes, setCodes] = useState(null);
+  const [codes, setCodes] = useState(MOCK_DISCOUNTS);
   const [showForm, setShowForm] = useState(false);
   const [f, setF] = useState({ code: '', type: 'percentage', value: '', min_order_amount: 0, usage_limit: '', expires_at: '' });
 
   const load = async () => {
-    setCodes(null);
-    try {
-      const list = await base44.entities.DiscountCode.list('-created_date', 100);
-      setCodes(list && list.length > 0 ? list : MOCK_DISCOUNTS);
-    }
-    catch { setCodes(MOCK_DISCOUNTS); }
+    setCodes(MOCK_DISCOUNTS);
   };
   useEffect(() => { load(); }, []);
 

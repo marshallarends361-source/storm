@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Package, User, MapPin, Heart, Plus, Trash2, Loader2 } from 'lucide-react';
@@ -22,7 +21,7 @@ export default function Account() {
   const [params, setParams] = useSearchParams();
   const tab = params.get('tab') || 'orders';
   const { toast } = useToast();
-  const [orders, setOrders] = useState(null);
+  const [orders, setOrders] = useState(MOCK_ORDERS);
   const [addresses, setAddresses] = useState([
     { id: '1', label: 'Home', line1: '123 Thunder Road', city: 'Oklahoma City', state: 'OK', zip: '73102' }
   ]);
@@ -35,14 +34,7 @@ export default function Account() {
 
   useEffect(() => {
     if (!user) return;
-    let active = true;
-    (async () => {
-      try {
-        const ords = await base44.entities.Order.filter({ customer_email: user.email }, '-created_date', 50);
-        if (active) setOrders(ords && ords.length > 0 ? ords : MOCK_ORDERS);
-      } catch { if (active) setOrders(MOCK_ORDERS); }
-    })();
-    return () => { active = false; };
+    setOrders(MOCK_ORDERS);
   }, [user]);
 
   if (!user) return <div className="max-w-2xl mx-auto px-4 py-20 text-center"><p className="text-muted-foreground">Please sign in to view your account.</p></div>;
@@ -61,13 +53,13 @@ export default function Account() {
   };
 
   const removeAddress = async (id) => {
-    await base44.entities.Address.delete(id);
     setAddresses(addresses.filter((a) => a.id !== id));
+    toast({ title: 'Address removed' });
   };
 
   const removeWish = async (id) => {
-    await base44.entities.Wishlist.delete(id);
     setWishlist(wishlist.filter((w) => w.id !== id));
+    toast({ title: 'Removed from wishlist' });
   };
 
   const tabs = [['orders', 'Orders', Package], ['profile', 'Profile', User], ['addresses', 'Addresses', MapPin], ['wishlist', 'Wishlist', Heart]];

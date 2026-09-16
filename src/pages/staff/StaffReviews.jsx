@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Check, Trash2, Star } from 'lucide-react';
 
@@ -11,16 +10,11 @@ const MOCK_REVIEWS = [
 
 export default function StaffReviews() {
   const { toast } = useToast();
-  const [reviews, setReviews] = useState(null);
+  const [reviews, setReviews] = useState(MOCK_REVIEWS);
   const [tab, setTab] = useState('pending');
 
   const load = async () => {
-    setReviews(null);
-    try {
-      const list = await base44.entities.Review.list('-created_date', 200);
-      setReviews(list && list.length > 0 ? list : MOCK_REVIEWS);
-    }
-    catch { setReviews(MOCK_REVIEWS); }
+    setReviews(MOCK_REVIEWS);
   };
   useEffect(() => { load(); }, []);
 

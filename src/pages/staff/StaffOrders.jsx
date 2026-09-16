@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, ChevronDown, Truck, Save } from 'lucide-react';
 
@@ -33,17 +32,12 @@ const MOCK_ORDERS = [
 
 export default function StaffOrders() {
   const { toast } = useToast();
-  const [orders, setOrders] = useState(null);
+  const [orders, setOrders] = useState(MOCK_ORDERS);
   const [expanded, setExpanded] = useState(null);
   const [filter, setFilter] = useState('');
 
   const load = async () => {
-    setOrders(null);
-    try {
-      const list = await base44.entities.Order.list('-created_date', 200);
-      setOrders(list && list.length > 0 ? list : MOCK_ORDERS);
-    }
-    catch { setOrders(MOCK_ORDERS); }
+    setOrders(MOCK_ORDERS);
   };
   useEffect(() => { load(); }, []);
 

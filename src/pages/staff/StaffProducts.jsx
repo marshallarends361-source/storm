@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Plus, Pencil, Trash2 } from 'lucide-react';
 import StaffProductForm from '@/components/staff/StaffProductForm';
@@ -12,17 +11,12 @@ const MOCK_PRODUCTS_LIST = [
 
 export default function StaffProducts() {
   const { toast } = useToast();
-  const [products, setProducts] = useState(null);
+  const [products, setProducts] = useState(MOCK_PRODUCTS_LIST);
   const [editing, setEditing] = useState(null);
   const [showForm, setShowForm] = useState(false);
 
   const load = async () => {
-    setProducts(null);
-    try {
-      const list = await base44.entities.Product.list('-created_date', 200);
-      setProducts(list && list.length > 0 ? list : MOCK_PRODUCTS_LIST);
-    }
-    catch { setProducts(MOCK_PRODUCTS_LIST); }
+    setProducts(MOCK_PRODUCTS_LIST);
   };
   useEffect(() => { load(); }, []);
 

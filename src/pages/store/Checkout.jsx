@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { base44 } from '@/api/base44Client';
 import { useCart } from '@/lib/cartContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Loader2, Lock, ArrowLeft, Zap } from 'lucide-react';
@@ -10,7 +9,7 @@ export default function Checkout() {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [shippingRates, setShippingRates] = useState([]);
+  const [shippingRates, setShippingRates] = useState([{ method: 'Standard', cost: subtotal >= 999 ? 0 : 99, estimated_days: '5-7 days' }]);
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
     email: '', name: '', line1: '', line2: '', city: '', state: '', zip: '', country: 'United States', phone: '',
@@ -18,13 +17,7 @@ export default function Checkout() {
   });
 
   useEffect(() => {
-    (async () => {
-      try {
-        const rates = await base44.entities.ShippingRate.filter({ active: true });
-        setShippingRates(rates || []);
-        if (rates?.length && !form.shippingMethod) setForm((f) => ({ ...f, shippingMethod: rates[0].method }));
-      } catch { /* ignore */ }
-    })();
+    // Standard rates loaded by default
   }, []);
 
   const shippingCost = (shippingRates.find((r) => r.method === form.shippingMethod)?.cost) ?? (subtotal >= 999 ? 0 : 99);
